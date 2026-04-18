@@ -1,0 +1,242 @@
+{% extends 'pages/shield_base.html' %}
+{% block title %}SMS Shield Console | Threat Intelligence Dashboard{% endblock %}
+
+{% block content %}
+    <!-- KPI Row -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-label">Total Analyzed</div>
+            <div class="kpi-value">{{ total_predictions }}</div>
+        </div>
+        <div class="kpi-card" style="border-bottom: 4px solid var(--accent-green);">
+            <div class="kpi-label">Not Spam Detected</div>
+            <div class="kpi-value text-green">{{ not_spam_count }}</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Lottery Detected</div>
+            <div class="kpi-value" style="color: #f59e0b;">{{ lottery_count }}</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">OTP Detected</div>
+            <div class="kpi-value" style="color: #3b82f6;">{{ otp_count }}</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Not Spam Rate</div>
+            <div class="kpi-value text-green">{{ not_spam_rate }}</div>
+        </div>
+    </div>
+
+    <!-- Quick Analysis Row -->
+    <div class="panel" style="margin-bottom: 2rem; flex-direction: row; align-items: flex-end; gap: 1rem;">
+        <div style="flex-grow: 1;">
+            <div class="panel-header" style="margin-bottom: 0.5rem;">Quick URL / SMS Scan</div>
+            <form action="{% url 'model_app:predict' %}" method="POST" style="display:flex; gap: 1rem;">
+                {% csrf_token %}
+                <textarea name="text" class="db-input" placeholder="Paste SMS content here for immediate analysis..." required style="margin-bottom: 0; flex-grow: 1; height: 50px; padding: 0.5rem;"></textarea>
+                <input type="hidden" name="model_choice" value="xgboost">
+                <button type="submit" class="btn-primary" style="height: 50px; white-space: nowrap;">Scan Message</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Charts Row 1 -->
+    <div class="middle-grid" style="grid-template-columns: 1fr 1fr;">
+        <div class="panel">
+            <div class="panel-header">Spam vs Not Spam</div>
+            <div class="chart-container">
+                <canvas id="mainLabelChart"></canvas>
+            </div>
+        </div>
+        <div class="panel">
+            <div class="panel-header">Keyword Hit Analysis</div>
+            <div class="chart-container">
+                <canvas id="subCatChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deep Analysis Row 2 -->
+    <div class="middle-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 2rem;">
+        <div class="panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <div class="panel-header" style="margin:0;">Confidence Distribution</div>
+                <span class="badge" style="background-color: var(--bg-hover);">Deep Analysis</span>
+            </div>
+            <div class="chart-container">
+                <canvas id="confidenceChart"></canvas>
+            </div>
+        </div>
+        <div class="panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <div class="panel-header" style="margin:0;">Engine Usage Pipeline</div>
+                <span class="badge" style="background-color: var(--bg-hover);">System Metrics</span>
+            </div>
+            <div class="chart-container">
+                <canvas id="engineChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Row -->
+    <div class="table-container">
+        <div class="panel-header" style="padding: 1.5rem 1.5rem 0.5rem;">Recent Messages</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Message Text</th>
+                    <th>Predicted Label</th>
+                    <th>Model</th>
+                    <th>Timestamp</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in recent_logs %}
+                <tr>
+                    <td><span class="truncate" style="max-width:300px; display:inline-block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ log.input_text }}</span></td>
+                    <td>
+                        <span class="badge {% if log.predicted_label|lower == 'spam' %}spam{% else %}ham{% endif %}">
+                            {{ log.predicted_label|upper }}
+                        </span>
+                    </td>
+                    <td style="color: var(--text-secondary);">{{ log.model_used|title }}</td>
+                    <td style="color: var(--text-secondary); font-size: 0.85rem;">{{ log.created_at|date:"Y-m-d H:i" }}</td>
+                    <td><span class="badge" style="background: transparent; color: var(--accent-teal);">Auto-Reviewed</span></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center; color: var(--text-secondary);">No predictions logged yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block page_scripts %}
+    {{ chart_data_json|json_script:"chart-data" }}
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chartDataEl = document.getElementById('chart-data');
+            if(chartDataEl) {
+                try {
+                    let data = JSON.parse(chartDataEl.textContent);
+                    if (typeof data === 'string') {
+                        data = JSON.parse(data);
+                    }
+                    
+                    // Globals
+                    Chart.defaults.color = '#94a3b8';
+                    Chart.defaults.font.family = "'Inter', sans-serif";
+                    Chart.defaults.borderColor = '#334155';
+
+                    // Spam vs Not Spam Bar Graph
+                    new Chart(document.getElementById('mainLabelChart').getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels: data.spam_vs_not_spam.labels,
+                            datasets: [{
+                                label: 'Message Count',
+                                data: data.spam_vs_not_spam.data,
+                                backgroundColor: [
+                                    '#ef4444', // Spam (red)
+                                    '#10b981'  // Not Spam (green)
+                                ],
+                                borderWidth: 0,
+                                borderRadius: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                x: { grid: { display: false } },
+                                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }
+                            }
+                        }
+                    });
+
+                    // Keyword Subcategory Bar Chart
+                    new Chart(document.getElementById('subCatChart').getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels: data.subcategories.labels,
+                            datasets: [{
+                                label: 'Detected Messages',
+                                data: data.subcategories.data,
+                                backgroundColor: ['#f59e0b', '#3b82f6', '#10b981'], // Lottery, OTP, Not Spam
+                                borderWidth: 0,
+                                borderRadius: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                x: { grid: { display: false } },
+                                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }
+                            }
+                        }
+                    });
+
+                    // Confidence Histogram (Bar)
+                    new Chart(document.getElementById('confidenceChart').getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels: data.confidence_buckets.labels,
+                            datasets: [{
+                                label: 'Message Count',
+                                data: data.confidence_buckets.data,
+                                backgroundColor: 'rgba(20, 184, 166, 0.8)', // Teal
+                                borderColor: '#14b8a6',
+                                borderWidth: 1,
+                                borderRadius: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                x: { grid: { display: false } },
+                                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }
+                            }
+                        }
+                    });
+
+                    // Engine Breakdown (Doughnut)
+                    new Chart(document.getElementById('engineChart').getContext('2d'), {
+                        type: 'doughnut',
+                        data: {
+                            labels: data.engine_breakdown.labels,
+                            datasets: [{
+                                data: data.engine_breakdown.data,
+                                backgroundColor: ['#6366f1', '#ec4899'], // Indigo & Pink to differentiate from classes
+                                borderWidth: 0,
+                                hoverOffset: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'right',
+                                    labels: { boxWidth: 12, padding: 15 }
+                                }
+                            },
+                            cutout: '60%'
+                        }
+                    });
+                } catch(error) {
+                    console.error('Chart Initialization Error:', error);
+                    const panels = document.querySelectorAll('.chart-container');
+                    panels.forEach(p => p.innerHTML = '<div style="color:var(--accent-red); font-size:12px; padding:10px;">JavaScript Crash: ' + error.message + '</div>');
+                }
+            }
+        });
+    </script>
+{% endblock %}

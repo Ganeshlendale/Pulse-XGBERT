@@ -1,0 +1,18 @@
+SMS_project/
+│── venv/              ✅ (virtual environment)
+│
+└── sms_spam/          ✅ (django project root)
+     │── manage.py
+     │
+      |___app__pages
+      |__app_profile_system
+      |
+      Project:
+     └── sms_spam/
+          ├── settings.py
+          ├── urls.py
+
+
+
+ENvironment:gun_env
+: .\gun_env\Scripts\Activate

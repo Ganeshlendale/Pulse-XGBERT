@@ -1,0 +1,56 @@
+{% extends "model_app/base.html" %}
+{% block title %}Result — Spam Classifier{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>✅ Prediction Result</h2>
+  <p style="color:#a0a0c0;margin-bottom:1rem;font-size:.9rem;">Input: <em>{{ input_text|truncatechars:120 }}</em></p>
+
+  <div style="display:flex;gap:1.5rem;flex-wrap:wrap;margin-bottom:1.5rem;">
+    <div style="flex:1;min-width:160px;background:#0f0f1a;border-radius:10px;padding:1rem;text-align:center;">
+      <div style="font-size:.75rem;color:#a0a0c0;margin-bottom:.3rem;">PREDICTED LABEL</div>
+      <div style="font-size:1.6rem;font-weight:700;color:#7c6fff;">{{ result.label }}</div>
+    </div>
+    <div style="flex:1;min-width:160px;background:#0f0f1a;border-radius:10px;padding:1rem;text-align:center;">
+      <div style="font-size:.75rem;color:#a0a0c0;margin-bottom:.3rem;">CONFIDENCE</div>
+      <div style="font-size:1.6rem;font-weight:700;color:#74c69d;">
+        {% if result.confidence %}{{ result.confidence|floatformat:2 }}{% else %}N/A{% endif %}
+      </div>
+    </div>
+    <div style="flex:1;min-width:160px;background:#0f0f1a;border-radius:10px;padding:1rem;text-align:center;">
+      <div style="font-size:.75rem;color:#a0a0c0;margin-bottom:.3rem;">MODEL USED</div>
+      <div style="font-size:1.2rem;font-weight:700;color:#a0d0f0;">{{ result.model_used }}</div>
+    </div>
+  </div>
+
+  {% if result.all_probs %}
+  <h3 style="font-size:.95rem;color:#a0a0c0;margin-bottom:.75rem;">Class Probabilities</h3>
+  <div class="prob-bar-wrap" style="margin-bottom:1.5rem;">
+    {% for label, prob in result.all_probs.items %}
+    <div class="prob-row">
+      <span class="prob-name">{{ label }}</span>
+      <div class="prob-bar-bg"><div class="prob-bar" style="width:{{ prob|floatformat:0 }}00%"></div></div>
+      <span class="prob-val">{{ prob|floatformat:2 }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h2>💬 Is this correct?</h2>
+  <p style="color:#a0a0c0;font-size:.88rem;margin-bottom:1rem;">Your feedback is stored for future model retraining.</p>
+  <form method="post" action="{% url 'model_app:feedback' result.prediction_id %}">
+    {% csrf_token %}
+    <div class="form-group">
+      <label>Correct Label</label>
+      {{ feedback_form.correct_label }}
+    </div>
+    <div class="form-group">
+      <label>Notes (optional)</label>
+      {{ feedback_form.notes }}
+    </div>
+    <button type="submit" class="btn btn-primary">Submit Feedback</button>
+    <a href="{% url 'model_app:index' %}" class="btn btn-secondary" style="margin-left:.5rem;">Skip</a>
+  </form>
+</div>
+{% endblock %}

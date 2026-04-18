@@ -1,0 +1,7 @@
+database:
+"ENGINE": "django.db.backends.mysql",
+        "NAME": "xg_boost",
+        "USER": "root",
+        "PASSWORD": "gung0918@G",
+        "HOST": "127.0.0.1",
+        "PORT": "3306",

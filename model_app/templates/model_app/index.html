@@ -1,0 +1,49 @@
+{% extends "model_app/base.html" %}
+{% block title %}Predict — Spam Classifier{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>📨 Classify a Message</h2>
+  <form id="predict-form" method="post" action="{% url 'model_app:predict' %}">
+    {% csrf_token %}
+    <div class="form-group">
+      <label>Message Text</label>
+      <textarea name="text" rows="5" placeholder="Paste your SMS / email message here …" required></textarea>
+    </div>
+    <div class="form-group">
+      <label>Model</label>
+      <select name="model_choice">
+        <option value="xgboost">XGBoost (fast · TF-IDF)</option>
+        <option value="distilbert">DistilBERT (deep learning)</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Classify →</button>
+  </form>
+</div>
+
+{% if recent %}
+<div class="card">
+  <h2>🕑 Recent Predictions</h2>
+  <table>
+    <thead><tr><th>#</th><th>Text</th><th>Label</th><th>Model</th><th>Confidence</th><th>Feedback</th></tr></thead>
+    <tbody>
+    {% for log in recent %}
+    <tr>
+      <td>#{{ forloop.counter }}</td>
+      <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ log.input_text|truncatechars:60 }}</td>
+      <td><span class="badge badge-label">{{ log.predicted_label }}</span></td>
+      <td><span class="badge {% if log.model_used == 'xgboost' %}badge-xgb{% else %}badge-db{% endif %}">{{ log.model_used }}</span></td>
+      <td>{% if log.confidence %}{{ log.confidence|floatformat:2 }}{% else %}—{% endif %}</td>
+      <td>
+        {% if log.feedback %}
+          <span class="badge {% if log.feedback.correct_label == log.predicted_label %}badge-correct{% else %}badge-wrong{% endif %}">{{ log.feedback.correct_label }}</span>
+        {% else %}
+          <a href="{% url 'model_app:feedback' log.id %}" class="btn btn-secondary btn-sm">Give Feedback</a>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}

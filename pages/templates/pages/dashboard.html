@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | SMS Spam Predictor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --dark-bg: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.15) 0px, transparent 50%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 4rem;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-light), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .profile-link {
+            color: var(--text-main);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .profile-link:hover {
+            color: var(--primary-light);
+        }
+
+        .btn {
+            padding: 0.5rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--secondary);
+            color: var(--secondary);
+            background: rgba(236, 72, 153, 0.05);
+        }
+
+        main {
+            flex-grow: 1;
+            padding: 4rem 10%;
+            display: flex;
+            flex-direction: column;
+            gap: 3rem;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .hero h1 span {
+            color: var(--primary-light);
+        }
+
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            flex-grow: 1;
+        }
+
+        .card .action-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .card .action-btn.secondary {
+            background: transparent;
+            border: 1px solid var(--primary);
+        }
+
+        .card .action-btn:hover {
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+        }
+        
+        .card .action-btn.secondary:hover {
+            background: rgba(99, 102, 241, 0.1);
+            box-shadow: none;
+        }
+
+        .recent-stats {
+            margin-top: 2rem;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .recent-stats h3 {
+            margin-bottom: 1.5rem;
+            font-size: 1.25rem;
+        }
+
+        .stat-badge {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary-light);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        footer a:hover {
+            color: var(--primary-light) !important;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">NexusPortal</div>
+        <div class="user-controls">
+            <a href="{% url 'profile_system:profile_detail' %}" class="profile-link">
+                {% if request.user.profile.avatar %}
+                    <img src="{{ request.user.profile.avatar.url }}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                {% else %}
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px;">
+                        {{ request.user.username|make_list|first|upper }}
+                    </div>
+                {% endif %}
+                {{ request.user.first_name|default:request.user.username }}
+            </a>
+            <form action="{% url 'profile_system:logout' %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline">Logout</button>
+            </form>
+        </div>
+    </nav>
+
+    <main>
+        <div class="hero">
+            <h1>Welcome back, <span>{{ request.user.username }}</span>.</h1>
+            <p>Your central command center for text analysis and model management.</p>
+        </div>
+
+        <!-- KPI Row -->
+        <div class="kpi-row" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+            <div class="card" style="padding: 1.5rem; text-align: center;">
+                <h3 style="color: var(--text-muted); font-size: 1rem; margin-bottom: 0.5rem; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">Total Predictions</h3>
+                <div style="font-size: 2.5rem; font-weight: 700; color: var(--primary-light);">{{ total_predictions }}</div>
+            </div>
+            <div class="card" style="padding: 1.5rem; text-align: center;">
+                <h3 style="color: var(--text-muted); font-size: 1rem; margin-bottom: 0.5rem; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">Spam Detected</h3>
+                <div style="font-size: 2.5rem; font-weight: 700; color: var(--secondary);">{{ spam_count }}</div>
+            </div>
+            <div class="card" style="padding: 1.5rem; text-align: center;">
+                <h3 style="color: var(--text-muted); font-size: 1rem; margin-bottom: 0.5rem; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">Ham Detected</h3>
+                <div style="font-size: 2.5rem; font-weight: 700; color: #10b981;">{{ ham_count }}</div>
+            </div>
+            <div class="card" style="padding: 1.5rem; text-align: center;">
+                <h3 style="color: var(--text-muted); font-size: 1rem; margin-bottom: 0.5rem; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">Top Engine</h3>
+                <div style="font-size: 2rem; font-weight: 700; color: var(--text-main); margin-top: 0.5rem;">
+                    {% if xgboost_count >= distilbert_count %}XGBoost{% else %}DistilBERT{% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="card">
+                <h2>🔍 New Prediction</h2>
+                <p>Run text messages through our dual-engine machine learning pipeline (XGBoost & DistilBERT) to classify spam vs ham.</p>
+                <a href="{% url 'model_app:index' %}" class="action-btn">Launch Predictor</a>
+            </div>
+
+            <div class="card">
+                <h2>📊 Analytics & History</h2>
+                <p>Review past predictions, analyze model confidence distribution, and submit feedback for continuous model retraining.</p>
+                <a href="{% url 'pages:sms_shield' %}" class="action-btn secondary">View History</a>
+            </div>
+
+            <div class="card">
+                <h2>🛡️ Client Dashboard</h2>
+                <p>Access your personalized advanced security shield and overview of all messaging threats.</p>
+                <a href="{% url 'pages:sms_shield' %}" class="action-btn secondary">Client Dashboard</a>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="charts-row" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem; margin-top: 3rem; margin-bottom: 1rem;">
+            <div class="card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 350px;">
+                <h3 style="margin-bottom: 1.5rem; font-size: 1.25rem;">Spam vs Ham Distribution</h3>
+                <div style="width: 100%; max-width: 250px;">
+                    <canvas id="labelChart"></canvas>
+                </div>
+            </div>
+            <div class="card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 350px;">
+                <h3 style="margin-bottom: 1.5rem; font-size: 1.25rem;">Engine Usage</h3>
+                <div style="width: 100%; max-width: 400px; padding: 0 1rem;">
+                    <canvas id="modelChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        {% if recent_logs %}
+        <div class="recent-stats">
+            <h3>Recent Platform Activity</h3>
+            <ul style="list-style: none; display: flex; flex-direction: column; gap: 1rem;">
+                {% for log in recent_logs %}
+                    <li style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 8px;">
+                        <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 60%; color: var(--text-main);">
+                            "{{ log.input_text }}"
+                        </div>
+                        <div style="display: flex; gap: 1rem; align-items: center;">
+                            <span class="stat-badge">{{ log.model_used|title }} Engine</span>
+                            <span style="font-weight: bold; color: {% if log.predicted_label == 'spam' %}var(--secondary){% else %}#10b981{% endif %};">
+                                {{ log.predicted_label|upper }}
+                            </span>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </main>
+
+    <footer style="margin-top: auto; border-top: 1px solid rgba(255, 255, 255, 0.1); padding: 2rem 4rem; text-align: center; background: rgba(15, 23, 42, 0.8);">
+        <div style="display: flex; justify-content: center; gap: 2.5rem; margin-bottom: 1.5rem;">
+            <a href="{% url 'pages:dashboard' %}" style="color: var(--text-muted); text-decoration: none; font-weight: 500; transition: color 0.3s;">Dashboard</a>
+            <a href="{% url 'model_app:index' %}" style="color: var(--text-muted); text-decoration: none; font-weight: 500; transition: color 0.3s;">Predictor</a>
+            <a href="{% url 'model_app:history' %}" style="color: var(--text-muted); text-decoration: none; font-weight: 500; transition: color 0.3s;">History</a>
+            <a href="{% url 'profile_system:profile_detail' %}" style="color: var(--text-muted); text-decoration: none; font-weight: 500; transition: color 0.3s;">Profile</a>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">&copy; {% now "Y" %} NexusPortal SMS Spam Predictor. All rights reserved.</p>
+    </footer>
+
+    {{ chart_data_json|json_script:"chart-data" }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chartDataElement = document.getElementById('chart-data');
+            if (chartDataElement) {
+                let chartData = JSON.parse(chartDataElement.textContent);
+                if (typeof chartData === 'string') {
+                    chartData = JSON.parse(chartData);
+                }
+                
+                // Set global Chart.js defaults for darker theme
+                Chart.defaults.color = '#94a3b8';
+                Chart.defaults.font.family = "'Outfit', sans-serif";
+
+                // Label Distribution Chart (Doughnut)
+                const labelCtx = document.getElementById('labelChart').getContext('2d');
+                new Chart(labelCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: chartData.label_distribution.labels,
+                        datasets: [{
+                            data: chartData.label_distribution.data,
+                            backgroundColor: [
+                                'rgba(236, 72, 153, 0.8)', // Secondary (Pink) for Spam
+                                'rgba(16, 185, 129, 0.8)'  // Emerald Green for Ham
+                            ],
+                            borderColor: [
+                                'rgba(236, 72, 153, 1)',
+                                'rgba(16, 185, 129, 1)'
+                            ],
+                            borderWidth: 1,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { padding: 20 } }
+                        },
+                        cutout: '70%'
+                    }
+                });
+
+                // Model Usage Chart (Bar)
+                const modelCtx = document.getElementById('modelChart').getContext('2d');
+                new Chart(modelCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: chartData.model_usage.labels,
+                        datasets: [{
+                            label: 'Predictions Made',
+                            data: chartData.model_usage.data,
+                            backgroundColor: 'rgba(99, 102, 241, 0.8)', // Primary (Indigo)
+                            borderColor: 'rgba(99, 102, 241, 1)',
+                            borderWidth: 1,
+                            borderRadius: 6,
+                            barPercentage: 0.5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.05)'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

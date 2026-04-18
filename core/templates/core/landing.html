@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMS Spam Shield | AI-Powered Threat Detection</title>
+    <!-- Google Fonts: Outfit and Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #09090b;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --secondary: #ec4899;
+            --surface: rgba(255, 255, 255, 0.03);
+            --surface-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Animated Background Gradients */
+        .bg-glow {
+            position: absolute;
+            width: 80vw;
+            height: 80vw;
+            top: -40vw;
+            left: -20vw;
+            background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, rgba(9,9,11,0) 70%);
+            border-radius: 50%;
+            z-index: -1;
+            animation: pulse-glow 10s ease-in-out infinite alternate;
+        }
+        
+        .bg-glow-2 {
+            position: absolute;
+            width: 60vw;
+            height: 60vw;
+            bottom: -30vw;
+            right: -10vw;
+            background: radial-gradient(circle, rgba(236,72,153,0.1) 0%, rgba(9,9,11,0) 70%);
+            border-radius: 50%;
+            z-index: -1;
+            animation: pulse-glow 8s ease-in-out infinite alternate-reverse;
+        }
+
+        @keyframes pulse-glow {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.1); opacity: 1; }
+        }
+
+        /* Navbar */
+        nav {
+            padding: 2rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--surface-border);
+            background: rgba(9, 9, 11, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #fff 0%, var(--text-muted) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-icon {
+            color: var(--primary);
+            -webkit-text-fill-color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-main);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--surface-border);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background: var(--surface);
+            border-color: var(--text-muted);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+            color: white;
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: calc(100vh - 100px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 4rem 2rem;
+            position: relative;
+        }
+
+        .badge {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            color: #818cf8;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .hero h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(3.5rem, 8vw, 6rem);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -2px;
+            margin-bottom: 1.5rem;
+            max-width: 1000px;
+        }
+
+        .text-gradient {
+            background: linear-gradient(to right, #fff 30%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: clamp(1.1rem, 2vw, 1.35rem);
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 3rem auto;
+            line-height: 1.8;
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Glassmorphism Feature Cards */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 4rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: var(--surface);
+            border: 1px solid var(--surface-border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(99, 102, 241, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .icon-wrapper {
+            width: 56px;
+            height: 56px;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+
+        .feature-card h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            nav { padding: 1.5rem 2rem; }
+            .nav-links { display: none; } /* Could add hamburger here later */
+            .features { padding: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-glow"></div>
+    <div class="bg-glow-2"></div>
+
+    <nav>
+        <div class="logo">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" class="logo-icon" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            Shield<span style="color: var(--text-main); font-weight: 400;">ML</span>
+        </div>
+        <div class="nav-links">
+            <a href="{% url 'model_app:index' %}">Public Scanner</a>
+            {% if request.user.is_authenticated %}
+                <a href="{% url 'pages:dashboard' %}">Dashboard</a>
+                <form action="{% url 'profile_system:logout' %}" method="POST" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline" style="padding: 0.5rem 1rem;">Logout</button>
+                </form>
+            {% else %}
+                <a href="{% url 'profile_system:login' %}">Sign In</a>
+                <a href="{% url 'profile_system:register' %}" class="btn btn-primary" style="padding: 0.5rem 1rem;">Sign up</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <main class="hero">
+        <div class="badge">Next-Gen Threat Intelligence</div>
+        <h1>Detect SMS Spam with <br><span class="text-gradient">Machine Learning.</span></h1>
+        <p>Defend against phishing, OTP theft, and lottery scams in real-time. Our dual-engine XGBoost and DistilBERT architecture provides an impenetrable shield for your communications.</p>
+        
+        <div class="cta-group">
+            <a href="{% url 'core:documentation' %}" class="btn btn-primary">
+                gun_mobel
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </a>
+            <a href="{% url 'model_app:index' %}" class="btn btn-outline">
+                Try Live Scanner
+            </a>
+        </div>
+    </main>
+
+    <section class="features">
+        <div class="feature-card">
+            <div class="icon-wrapper">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+            </div>
+            <h3>Dual Engine Analysis</h3>
+            <p>Harness the combined power of high-speed XGBoost heuristics and deep-context DistilBERT neural networks to detect threats with unmatched precision.</p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="icon-wrapper">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            </div>
+            <h3>Absolute Data Privacy</h3>
+            <p>Your intelligence, isolated. Every scan and insight is strictly sandboxed to your account, ensuring zero cross-contamination of threat data.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="icon-wrapper">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            </div>
+            <h3>Live Telemetry</h3>
+            <p>Monitor threat vectors through an advanced dashboard with instant visualizations of spam categorization, confidence intervals, and pipeline health.</p>
+        </div>
+    </section>
+
+    <section class="features" style="padding-top: 0;">
+        <div class="feature-card" style="grid-column: 1 / -1; margin-top: 0;">
+            <h3 style="text-align: center; margin-bottom: 2rem;">Public Scanner Activity (Last 7 Days)</h3>
+            <div style="width: 100%; height: 350px;">
+                <canvas id="publicLineChart"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <footer style="margin-top: auto; border-top: 1px solid var(--surface-border); padding: 2rem 4rem; text-align: center; background: rgba(9, 9, 11, 0.8);">
+        <div style="display: flex; justify-content: center; gap: 2.5rem; margin-bottom: 1.5rem;">
+            <a href="{% url 'model_app:index' %}" style="color: var(--text-muted); text-decoration: none; font-weight: 500; transition: color 0.3s;">Public Scanner</a>
+            {% if request.user.is_authenticated %}
+                <a href="{% url 'pages:dashboard' %}" style="color: var(--text-muted); text-decoration: none; font-weight: 500; transition: color 0.3s;">Dashboard</a>
+                <a href="{% url 'profile_system:profile_detail' %}" style="color: var(--text-muted); text-decoration: none; font-weight: 500; transition: color 0.3s;">Profile</a>
+            {% else %}
+                <a href="{% url 'profile_system:login' %}" style="color: var(--text-muted); text-decoration: none; font-weight: 500; transition: color 0.3s;">Sign In</a>
+                <a href="{% url 'profile_system:register' %}" style="color: var(--text-muted); text-decoration: none; font-weight: 500; transition: color 0.3s;">Register</a>
+            {% endif %}
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">&copy; {% now "Y" %} ShieldML - NexusPortal SMS Spam Predictor. All rights reserved.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {{ chart_data_json|json_script:"chart-data" }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chartDataElement = document.getElementById('chart-data');
+            if (chartDataElement) {
+                let chartData = JSON.parse(chartDataElement.textContent);
+                if (typeof chartData === 'string') {
+                    chartData = JSON.parse(chartData);
+                }
+                
+                Chart.defaults.color = '#94a3b8';
+                Chart.defaults.font.family = "'Inter', sans-serif";
+
+                const ctx = document.getElementById('publicLineChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: chartData.dates,
+                        datasets: [
+                            {
+                                label: 'Spam Detected',
+                                data: chartData.spam,
+                                borderColor: '#ef4444',
+                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            },
+                            {
+                                label: 'Ham (Safe)',
+                                data: chartData.ham,
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.05)'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.05)'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

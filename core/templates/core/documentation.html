@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation | ShieldML</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #09090b;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --secondary: #ec4899;
+            --surface: rgba(255, 255, 255, 0.03);
+            --surface-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar */
+        nav {
+            padding: 1.5rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--surface-border);
+            background: rgba(9, 9, 11, 0.7);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, var(--text-muted) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .logo-icon { color: var(--primary); -webkit-text-fill-color: var(--primary); }
+
+        .nav-links { display: flex; gap: 2rem; align-items: center; }
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.2s ease;
+        }
+        .nav-links a:hover { color: var(--text-main); }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--surface-border);
+            color: var(--text-main);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .btn-outline:hover { background: var(--surface); border-color: var(--text-muted); }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            flex-grow: 1;
+        }
+
+        .header-doc {
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, #fff 30%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.8rem;
+            margin-top: 3rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-main);
+            border-bottom: 1px solid var(--surface-border);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.3rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+        }
+
+        p {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            font-size: 1.05rem;
+        }
+
+        .card-panel {
+            background: var(--surface);
+            border: 1px solid var(--surface-border);
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        ul {
+            color: var(--text-muted);
+            margin-left: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        li { margin-bottom: 0.5rem; }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .graph-desc {
+            height: 100%;
+            background: rgba(99, 102, 241, 0.05);
+            border-left: 3px solid var(--primary);
+            padding: 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 1rem;
+            transition: transform 0.3s, background 0.3s;
+        }
+        
+        .graph-desc:hover {
+            transform: translateX(5px);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        footer {
+            margin-top: auto;
+            border-top: 1px solid var(--surface-border);
+            padding: 2rem 4rem;
+            text-align: center;
+            background: rgba(9, 9, 11, 0.8);
+        }
+        
+        footer a { color: var(--text-muted); text-decoration: none; font-weight: 500; transition: color 0.3s; margin: 0 1rem; }
+        footer a:hover { color: var(--primary); }
+        
+        @media (max-width: 768px) {
+            .feature-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="logo-icon" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            Shield<span style="color: var(--text-main); font-weight: 400;">ML</span>
+        </div>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="{% url 'model_app:index' %}">Public Scanner</a>
+            {% if request.user.is_authenticated %}
+                <a href="{% url 'pages:dashboard' %}" class="btn-outline">Dashboard</a>
+            {% else %}
+                <a href="{% url 'profile_system:login' %}" class="btn-outline">Sign In</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header-doc">
+            <h1>Platform Documentation</h1>
+            <p>Comprehensive guide to the ShieldML Dual-Engine SMS Spam Prediction Framework.</p>
+        </div>
+
+        <div class="card-panel">
+            <h2>🌍 1. Project Overview</h2>
+            <p>ShieldML is an advanced messaging security framework constructed to intercept, classify, and isolate mobile threat vectors—specifically targeting phishing, OTP scams, and lottery fraud.</p>
+            <p>Relying on a <strong>dual-pipeline architecture</strong>, our platform offers both a lightning-fast heuristic engine (<code>XGBoost</code>) utilizing TF-IDF vectors, and a deep-context natural language engine (<code>DistilBERT</code>) utilizing transformer models to catch highly sophisticated attacks.</p>
+        </div>
+
+        <div class="card-panel">
+            <h2>📊 2. Graph & Analysis Representation</h2>
+            <p>Data tells the story of your security perimeter. We represent our live ML telemetry data using a streamlined, neon-dark Chart.js theme to deliver unparalleled clarity across all user dashboards.</p>
+            
+            <div class="feature-grid">
+                <div>
+                    <div class="graph-desc">
+                        <strong style="color: var(--text-main);">Spam vs Ham Doughnut Chart</strong><br><br>
+                        Shows the raw aggregate breakdown of threats. Highlighted in dynamic Emerald (Safe) and Rose (Spam), displaying your total inbox purity at a single glance.
+                    </div>
+                </div>
+                <div>
+                    <div class="graph-desc">
+                        <strong style="color: var(--text-main);">7-Day Public Activity Line Graph</strong><br><br>
+                        Plotted on the main landing page, this chart maps global scanner velocity against time. Spikes in red indicate incoming widespread phishing attacks traversing our public scanners.
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-grid">
+                <div>
+                    <div class="graph-desc">
+                        <strong style="color: var(--text-main);">Engine Utilization Bar Chart</strong><br><br>
+                        A performance metric showing whether users are prioritizing speed (XGBoost) or depth (DistilBERT). Represented physically on the client dashboard.
+                    </div>
+                </div>
+                <div>
+                    <div class="graph-desc">
+                        <strong style="color: var(--text-main);">Keyword Subcategory Hit Rate</strong><br><br>
+                        Tracks specific malicious subcategories like "OTP Theft" and "Lottery Scam" to inform users exactly <em>what</em> type of threat they are facing, not just <em>if</em> it is a threat.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-panel">
+            <h2>🏢 3. Real-World Use Cases</h2>
+            <p>Our infrastructure is designed for scalability and adaptation across multi-tier environments:</p>
+            <ul>
+                <li><strong>Enterprise SMS Gateways:</strong> Clean outgoing/incoming messaging traffic from API gateways (e.g., Twilio, Plivo) automatically before it hits the consumer.</li>
+                <li><strong>Personal Client Dashboard:</strong> Individual users log in and immediately see their dedicated Shield history. They can manually parse confusing or suspicious messages sent by unknown numbers to get an instant safety report before clicking any embedded links.</li>
+                <li><strong>Crowdsourced Intelligence:</strong> The Public Scanner aggregates global threat data from non-authenticated users. This feeds into our broader Machine Learning retraining pipeline to continuously adapt to zero-day spam campaigns, sharing threat intelligence safely.</li>
+            </ul>
+        </div>
+        
+        <div class="card-panel">
+            <h2>🛠️ 4. Quick-Start Guide for Users</h2>
+            <p>Using the system is designed to be completely frictionless:</p>
+            <ol style="color: var(--text-muted); margin-left: 1.5rem; line-height: 1.8;">
+                <li><strong style="color: var(--text-main);">Login or Register:</strong> Secure an account to keep your prediction history completely private and sandboxed.</li>
+                <li><strong style="color: var(--text-main);">Navigate to the Dashboard:</strong> View your historical trends, engine breakdown, and aggregate metrics.</li>
+                <li><strong style="color: var(--text-main);">Access the Predictor:</strong> Paste the text of an SMS or URL.</li>
+                <li><strong style="color: var(--text-main);">Select your Engine:</strong> Pick XGBoost for instant checking against known patterns, or DistilBERT for deep contextual reading (useful for subtle social engineering).</li>
+                <li><strong style="color: var(--text-main);">Analyze the Log:</strong> View your database records securely to trace the status and human-correct our engines if a false positive occurs.</li>
+            </ol>
+        </div>
+    </div>
+
+    <footer>
+        <div style="margin-bottom: 1rem;">
+            <a href="/">Home</a>
+            <a href="{% url 'model_app:index' %}">Public Scanner</a>
+            {% if request.user.is_authenticated %}
+            <a href="{% url 'pages:dashboard' %}">Dashboard</a>
+            {% endif %}
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">&copy; {% now "Y" %} ShieldML - NexusPortal SMS Spam Predictor. All rights reserved.</p>
+    </footer>
+</body>
+</html>

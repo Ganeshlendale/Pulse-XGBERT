@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SMS Shield Console | Threat Intelligence Dashboard{% endblock %}</title>
+    <!-- Use clear sans-serif like Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        :root {
+            --bg-base: #0f172a; /* Slate 900 */
+            --bg-panel: #1e293b; /* Slate 800 */
+            --bg-hover: #334155; /* Slate 700 */
+            --text-primary: #f8fafc; /* Slate 50 */
+            --text-secondary: #94a3b8; /* Slate 400 */
+            --accent-teal: #14b8a6; /* Teal 500 */
+            --accent-red: #ef4444; /* Red 500 */
+            --accent-green: #10b981; /* Emerald 500 */
+            --border-col: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            display: flex;
+            height: 100vh;
+            overflow: hidden; /* Only main section scrolls */
+        }
+
+        /* Sidebar */
+        aside {
+            width: 260px;
+            background-color: var(--bg-panel);
+            border-right: 1px solid var(--border-col);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            padding: 1.5rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent-teal);
+            border-bottom: 1px solid var(--border-col);
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            padding: 1rem 0;
+            flex-grow: 1;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 0.75rem 1.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--text-primary);
+            background-color: var(--bg-hover);
+            border-left: 3px solid var(--accent-teal);
+        }
+
+        /* Main Content Container */
+        .wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Top Header */
+        header {
+            background-color: var(--bg-panel);
+            height: 64px;
+            border-bottom: 1px solid var(--border-col);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            flex-shrink: 0;
+        }
+
+        .status-strip {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .dot-green {
+            height: 8px;
+            width: 8px;
+            background-color: var(--accent-green);
+            border-radius: 50%;
+        }
+        
+        .user-nav a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Main Scrollable Area */
+        main {
+            padding: 2rem;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        
+        /* Reusable Common UI Component Classes (Exported for extensions to use) */
+        
+        /* Headers / Subtitles */
+        h2.section-header { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-primary); }
+        p.section-subtitle { font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 2rem; }
+        
+        /* KPI System */
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-bottom: 2rem; }
+        .kpi-card { background-color: var(--bg-panel); border: 1px solid var(--border-col); border-radius: 6px; padding: 1.25rem; }
+        .kpi-label { font-size: 0.75rem; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.5px; font-weight: 600; margin-bottom: 0.5rem; }
+        .kpi-value { font-size: 1.75rem; font-weight: 700; }
+        .text-red { color: var(--accent-red); }
+        .text-green { color: var(--accent-green); }
+
+        /* Panels and Chart grids */
+        .panel { background-color: var(--bg-panel); border: 1px solid var(--border-col); border-radius: 6px; padding: 1.5rem; display: flex; flex-direction: column; }
+        .panel-header { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary); }
+        .chart-container { position: relative; flex-grow: 1; min-height: 200px; width: 100%; }
+        
+        /* Badges */
+        .badge { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; background-color: var(--bg-hover); color: var(--text-primary); }
+        .badge.spam { background-color: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+        .badge.ham { background-color: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
+        
+        /* Form Utilities */
+        textarea.db-input { width: 100%; background-color: var(--bg-base); border: 1px solid var(--border-col); color: var(--text-primary); padding: 0.75rem; border-radius: 4px; resize: none; margin-bottom: 1rem; }
+        .btn-primary { display: inline-block; background-color: var(--accent-teal); color: #0f172a; border: none; padding: 0.75rem 1rem; font-weight: 600; border-radius: 4px; cursor: pointer; text-align: center; text-decoration: none; transition: opacity 0.2s; }
+        .btn-primary:hover { opacity: 0.9; }
+
+        /* Table Utilities */
+        .table-container { background-color: var(--bg-panel); border: 1px solid var(--border-col); border-radius: 6px; overflow: hidden; margin-bottom: 2rem; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+        th, td { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-col); }
+        th { background-color: rgba(0,0,0,0.2); color: var(--text-secondary); font-weight: 600; }
+        tbody tr:hover { background-color: rgba(255,255,255,0.02); }
+        
+        {% block extra_css %}{% endblock %}
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <aside>
+        <div class="brand">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            SMS Shield
+        </div>
+        <nav class="nav-links">
+            <a href="{% url 'core:landing' %}" class="nav-link">Home</a>
+            <a href="{% url 'pages:dashboard' %}" class="nav-link">Dashboard</a>
+            <a href="{% url 'pages:sms_shield' %}" class="nav-link {% if request.resolver_match.url_name == 'sms_shield' %}active{% endif %}">Security Console</a>
+            <a href="{% url 'pages:model_insights' %}" class="nav-link {% if request.resolver_match.url_name == 'model_insights' %}active{% endif %}">Model Insights</a>
+            <a href="{% url 'pages:database_records' %}" class="nav-link {% if request.resolver_match.url_name == 'database_records' %}active{% endif %}">Database Records</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="wrapper">
+        <header>
+            <div class="status-strip">
+                <div class="status-item">
+                    <div class="dot-green"></div> System Online
+                </div>
+                <div class="status-item">
+                    <div class="dot-green"></div> Engine Ready
+                </div>
+            </div>
+            <div class="user-nav">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'profile_system:profile_detail' %}">{{ user.username|title }} ▾</a>
+                {% else %}
+                    <a href="{% url 'profile_system:login' %}">Login</a>
+                {% endif %}
+            </div>
+        </header>
+
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    {% block page_scripts %}{% endblock %}
+</body>
+</html>

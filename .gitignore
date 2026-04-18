@@ -1,0 +1,50 @@
+venv/
+env/
+gun_env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Django
+db.sqlite3
+db.sqlite3-journal
+media/
+
+# Environment
+.env
+.venv
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ML Models
+*.pkl
+*.h5
+*.model
+ml_models/
+
+# Ignore project generated docs not needed in repo
+*.pdf
+*.png
+pdf_text_output.txt
+scratch/

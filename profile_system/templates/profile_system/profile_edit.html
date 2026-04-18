@@ -1,0 +1,126 @@
+{% extends 'profile_system/base.html' %}
+{% block title %}Edit Profile — SMS Spam{% endblock %}
+
+{% block extra_css %}
+<style>
+.edit-header { margin-bottom: 1.75rem; }
+.edit-header h1 { margin-bottom: 0.25rem; }
+.form-section { margin-bottom: 2rem; }
+.section-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.8rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+}
+.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+@media (max-width: 600px) {
+    .form-row-2, .form-row-3 { grid-template-columns: 1fr; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="edit-header">
+    <h1>Edit Profile</h1>
+    <p class="text-muted">Update your account information and personal details.</p>
+</div>
+
+<div class="card">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="form-section">
+            <div class="section-label">Account Information</div>
+            <div class="form-row-2">
+                <div class="form-group">
+                    <label>First Name</label>
+                    {{ user_form.first_name }}
+                    {% if user_form.first_name.errors %}<ul class="errorlist">{% for e in user_form.first_name.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+                </div>
+                <div class="form-group">
+                    <label>Last Name</label>
+                    {{ user_form.last_name }}
+                    {% if user_form.last_name.errors %}<ul class="errorlist">{% for e in user_form.last_name.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+                </div>
+            </div>
+            <div class="form-row-2">
+                <div class="form-group">
+                    <label>Username</label>
+                    {{ user_form.username }}
+                    {% if user_form.username.errors %}<ul class="errorlist">{% for e in user_form.username.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    {{ user_form.email }}
+                    {% if user_form.email.errors %}<ul class="errorlist">{% for e in user_form.email.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="section-label">Personal Details</div>
+            <div class="form-group">
+                <label>Profile Photo</label>
+                {{ profile_form.avatar }}
+            </div>
+            <div class="form-group">
+                <label>Bio</label>
+                {{ profile_form.bio }}
+            </div>
+            <div class="form-row-3">
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    {{ profile_form.phone_number }}
+                </div>
+                <div class="form-group">
+                    <label>Gender</label>
+                    {{ profile_form.gender }}
+                </div>
+                <div class="form-group">
+                    <label>Date of Birth</label>
+                    {{ profile_form.date_of_birth }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Website</label>
+                {{ profile_form.website }}
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="section-label">Address</div>
+            <div class="form-group">
+                <label>Street Address</label>
+                {{ profile_form.address }}
+            </div>
+            <div class="form-row-3">
+                <div class="form-group">
+                    <label>City</label>
+                    {{ profile_form.city }}
+                </div>
+                <div class="form-group">
+                    <label>State</label>
+                    {{ profile_form.state }}
+                </div>
+                <div class="form-group">
+                    <label>Pincode</label>
+                    {{ profile_form.pincode }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Country</label>
+                {{ profile_form.country }}
+            </div>
+        </div>
+
+        <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a href="{% url 'profile_system:profile_detail' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

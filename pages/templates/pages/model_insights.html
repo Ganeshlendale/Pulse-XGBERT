@@ -1,0 +1,70 @@
+{% extends 'pages/shield_base.html' %}
+{% block title %}Model Insights | Threat Intelligence Dashboard{% endblock %}
+
+{% block content %}
+    <h2 class="section-header">Model Performance Metrics</h2>
+    <p class="section-subtitle">Real-time precision verification mathematically calculated exclusively from human feedback mapping.</p>
+
+    <!-- KPI Row -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-label">Human Verified Models</div>
+            <div class="kpi-value">{{ total_verified }}</div>
+        </div>
+        <div class="kpi-card" style="border-bottom: 4px solid var(--accent-green);">
+            <div class="kpi-label">Overall Accuracy Rate</div>
+            <div class="kpi-value text-green">{{ accuracy_rate }}</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">XGBoost Precision</div>
+            <div class="kpi-value" style="color: #6366f1;">{{ xgb_acc }}</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">DistilBERT Precision</div>
+            <div class="kpi-value" style="color: #ec4899;">{{ dist_acc }}</div>
+        </div>
+    </div>
+
+    <!-- Low Confidence Review Queue -->
+    <div class="table-container" style="margin-top: 2rem;">
+        <div class="panel-header" style="padding: 1.5rem 1.5rem 0.5rem; display:flex; justify-content:space-between; align-items:center;">
+             <span>Low Confidence Review Queue (< 70%)</span>
+             <span class="badge" style="background-color:rgba(239, 68, 68, 0.2); color:#fca5a5;">Priority Human Review</span>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Confidence</th>
+                    <th>Predicted Label</th>
+                    <th>Engine</th>
+                    <th>Message Snippet</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in low_confidence_queue %}
+                <tr>
+                    <td style="color: var(--accent-red); font-weight: 600;">
+                        {{ log.confidence|default:0|floatformat:2 }}
+                    </td>
+                    <td>
+                        <span class="badge {% if log.predicted_label|lower == 'spam' %}spam{% else %}ham{% endif %}">
+                            {{ log.predicted_label|upper }}
+                        </span>
+                    </td>
+                    <td style="color: var(--text-secondary);">{{ log.model_used|title }}</td>
+                    <td><span class="truncate" style="max-width:300px; display:inline-block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ log.input_text }}</span></td>
+                    <td>
+                        <!-- Fallback to basic link. Ensure your history page handles feedback loops natively -->
+                        <a href="{% url 'model_app:submit_feedback' log.id %}" class="badge" style="background-color: var(--accent-teal); color: #0f172a; text-decoration: none;">Provide Feedback</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 3rem;">No low confidence predictions in queue. Model running strongly!</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "model_app/base.html" %}
+{% block title %}Feedback — Spam Classifier{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>💬 Provide Feedback</h2>
+  <div style="background:#0f0f1a;border-radius:8px;padding:1rem;margin-bottom:1.2rem;">
+    <div style="font-size:.75rem;color:#a0a0c0;margin-bottom:.3rem;">ORIGINAL TEXT</div>
+    <p style="font-size:.9rem;">{{ log.input_text|truncatechars:200 }}</p>
+    <div style="margin-top:.6rem;">
+      <span class="badge badge-label">Predicted: {{ log.predicted_label }}</span>
+      <span class="badge {% if log.model_used == 'xgboost' %}badge-xgb{% else %}badge-db{% endif %}" style="margin-left:.4rem;">{{ log.model_used }}</span>
+    </div>
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      <label>What is the correct label?</label>
+      {{ form.correct_label }}
+    </div>
+    <div class="form-group">
+      <label>Notes (optional)</label>
+      {{ form.notes }}
+    </div>
+    <button type="submit" class="btn btn-primary">Submit Feedback</button>
+    <a href="{% url 'model_app:index' %}" class="btn btn-secondary" style="margin-left:.5rem;">Cancel</a>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'pages/shield_base.html' %}
+{% block title %}Database Records | Threat Intelligence Dashboard{% endblock %}
+
+{% block content %}
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 2rem;">
+        <div>
+            <h2 class="section-header">Database Management</h2>
+            <p class="section-subtitle" style="margin:0;">Raw pipeline exports. Showing newest 200 pipeline predictions natively from SQLite storage.</p>
+        </div>
+        <a href="{% url 'model_app:export_feedback' %}" class="btn-primary" style="display:flex; align-items:center; gap:0.5rem; background-color: var(--text-primary);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Export Verified CSV
+        </a>
+    </div>
+
+    <!-- Huge Database Table -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Engine Used</th>
+                    <th>Confidence</th>
+                    <th>Raw Prediction</th>
+                    <th>Human Override</th>
+                    <th style="width: 40%;">Input Text</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in all_logs %}
+                <tr>
+                    <td style="color: var(--text-secondary);">#{{ forloop.counter }}</td>
+                    <td><span class="badge" style="background-color:var(--bg-hover);">{{ log.model_used|upper }}</span></td>
+                    <td style="font-family: monospace;">{{ log.confidence|default:0|floatformat:4 }}</td>
+                    <td>
+                        <span class="badge {% if log.predicted_label|lower == 'spam' %}spam{% else %}ham{% endif %}">
+                            {{ log.predicted_label|upper }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if log.feedback %}
+                            <span class="badge" style="background-color: rgba(20, 184, 166, 0.2); color: #5eead4;">
+                                {{ log.feedback.correct_label|upper }}
+                            </span>
+                        {% else %}
+                            <span style="color: var(--text-secondary); font-size: 0.85rem;">None</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div style="max-height: 2.8rem; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; font-size: 0.85rem; color: var(--text-secondary);">
+                            {{ log.input_text }}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 5rem;">No logs found in database. Send a text via the scanner!</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
