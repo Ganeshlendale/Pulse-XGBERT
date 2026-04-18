@@ -68,17 +68,14 @@ def _load_distilbert():
             import torch
             from transformers import DistilBertTokenizerFast, DistilBertForSequenceClassification
 
-            db_dir = os.path.join(MODELS_DIR, "distilbert")
-            logger.info("Loading DistilBERT artefacts …")
-            _db_tokenizer = DistilBertTokenizerFast.from_pretrained(db_dir)
-            _db_model = DistilBertForSequenceClassification.from_pretrained(db_dir)
+            MODEL_NAME = "Ganeshlendale/pulse-xgbert-distilbert"
+            logger.info(f"Loading DistilBERT artefacts from Hugging Face ({MODEL_NAME}) …")
+            _db_tokenizer = DistilBertTokenizerFast.from_pretrained(MODEL_NAME)
+            _db_model = DistilBertForSequenceClassification.from_pretrained(MODEL_NAME)
             _db_model.eval()
 
-            import json
-            with open(os.path.join(db_dir, "config.json")) as f:
-                cfg = json.load(f)
-            _db_id2label = cfg.get("id2label", {})
-            logger.info("DistilBERT artefacts loaded.")
+            _db_id2label = _db_model.config.id2label if hasattr(_db_model.config, 'id2label') else {}
+            logger.info("DistilBERT artefacts loaded from Hugging Face.")
         except ImportError as e:
             raise RuntimeError(
                 "transformers / torch not installed. "
